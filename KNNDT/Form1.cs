@@ -14,6 +14,7 @@ namespace KNNDT
         int k;
         int lastNumber;
         string result;
+        string result2;
 
         public Form1()
         {
@@ -29,8 +30,7 @@ namespace KNNDT
             //{
             //filling tables
             dgv1.ReadOnly = true;
-           // dgv2.ReadOnly = true;
-
+            // dgv2.ReadOnly = true;
 
             SqlDataAdapter adapter = new SqlDataAdapter("Select * from KLASIFIKUOTI", conString);
             DataTable dt = new DataTable();
@@ -51,104 +51,148 @@ namespace KNNDT
             return result;
         }
 
+
+        //issaiskinti kuriu daugiau=pliusu ar minusu=rezultatas graz
+        public string countingResult(int p, int m)
+        {
+            string r;
+            if (p > m)
+            {
+                r = "PLUS";
+
+            }
+            else if (m > p)
+            {
+                r = "MINUS";
+
+            }
+            else
+            {
+                r = "NEAISKU";
+            }
+            return r;
+        }
         public void start_Click(object sender, EventArgs e)
         {
-            int rc = 0;
+
+            double[] x1Data = new double[dgv1.RowCount - 1];
+            double[] x2Data = new double[dgv1.RowCount - 1];
+            string[] classData = new string[dgv1.RowCount - 1];
+            //distance for first point:
+            double[] distance = new double[dgv1.RowCount - 1];
+            //Distance for second point:
+            double[] distance2 = new double[dgv1.RowCount - 1];
+            //xtest1 X
+            //xtest2 Y
+            double[] xTest1 = new double[dgv2.RowCount - 1];
+            double[] xTest2 = new double[dgv2.RowCount - 1];
+
+            for (int i = 0; i < dgv2.RowCount - 1; i++)
+            {
+                xTest1[i] = Convert.ToDouble(dgv2.Rows[i].Cells[0].Value);
+                xTest2[i] = Convert.ToDouble(dgv2.Rows[i].Cells[1].Value);
+
+            }
            
-                double[] x1Data = new double[dgv1.RowCount - 1];
-                double[] x2Data = new double[dgv1.RowCount - 1];
-                string[] classData = new string[dgv1.RowCount - 1];
-                double[] distance = new double[dgv1.RowCount - 1];
-                double[] xTest1 = new double[dgv2.RowCount - 1];
-                double[] xTest2 = new double[dgv2.RowCount - 1];
+            for (int i = 0; i < dgv1.RowCount - 1; i++)
+            {
+                x1Data[i] = Convert.ToDouble(dgv1.Rows[i].Cells[0].Value);
+                x2Data[i] = Convert.ToDouble(dgv1.Rows[i].Cells[1].Value);
 
-
-                for (int i = 0; i < dgv2.RowCount - 1; i++)
-                {
-                    xTest1[i] = Convert.ToDouble(dgv2.Rows[i].Cells[0].Value);
-                    xTest2[i] = Convert.ToDouble(dgv2.Rows[i].Cells[1].Value);
-
-                }
-
-                for (int i = 0; i < dgv1.RowCount - 1; i++)
-                {
-                    x1Data[i] = Convert.ToDouble(dgv1.Rows[i].Cells[0].Value);
-                    x2Data[i] = Convert.ToDouble(dgv1.Rows[i].Cells[1].Value);
-
-                    classData[i] = Convert.ToString(dgv1.Rows[i].Cells[2].Value);
+                classData[i] = Convert.ToString(dgv1.Rows[i].Cells[2].Value);
 
 
                 distance[i] = distanceToCenterFunction(xTest1[0], xTest2[0], x1Data[i], x2Data[i]);
+                distance2[i] = distanceToCenterFunction(xTest1[1], xTest2[1], x1Data[i], x2Data[i]);
 
-                }
+            }
+           
 
+            //find k
+            k = Convert.ToInt32(comboBox1.SelectedItem);
 
-                //find k
-                k = Convert.ToInt32(comboBox1.SelectedItem);
+            double[] distanceCopy = new double[dgv1.RowCount - 1];
+            double[] distanceAscending = new double[dgv1.RowCount - 1];
+            double[] distanceAscendingIndexNumber = new double[dgv1.RowCount - 1];
+            //for second point
+            double[] distance2Copy = new double[dgv1.RowCount - 1];
+            double[] distance2Ascending = new double[dgv1.RowCount - 1];
+            double[] distance2AscendingIndexNumber = new double[dgv1.RowCount - 1];
+            double smallest = 9999;
 
-                double[] distanceCopy = new double[dgv1.RowCount - 1];
-                double[] distanceAscending = new double[dgv1.RowCount - 1];
-                double[] distanceAscendingIndexNumber = new double[dgv1.RowCount - 1];
-                double smallest = 9999;
+            foreach (var item in distance)
+            {
+                distanceCopy = distance;
+            }
 
-                foreach (var item in distance)
+            foreach (var item in distance2)
+            {
+                distance2Copy = distance2;
+            }
+
+            for (int j = 0; j < dgv1.RowCount - 1; j++)
+            {
+                for (int i = 0; i < dgv1.RowCount - 1; i++)
                 {
-                    distanceCopy = distance;
-                }
-
-                for (int j = 0; j < dgv1.RowCount - 1; j++)
-                {
-                    for (int i = 0; i < dgv1.RowCount - 1; i++)
+                    if (smallest > distanceCopy[i])
                     {
-                        if (smallest > distanceCopy[i])
-                        {
-                            smallest = distanceCopy[i];
-                            distanceAscending[j] = smallest;
-                            distanceAscendingIndexNumber[j] = i;
-                            lastNumber = i;
-                        }
+                        smallest = distanceCopy[i];
+                        distanceAscending[j] = smallest;
+                        distanceAscendingIndexNumber[j] = i;
+                        lastNumber = i;
                     }
-                    distanceCopy[lastNumber] = 9999;
-                    smallest = 9999;
                 }
+                distanceCopy[lastNumber] = 9999;
+                smallest = 9999;
+            }
 
 
-                rtbDistance.Text = null;
-                rbtIndex.Text = null;
-                rbtClass.Text = null;
-                List<string> classList = new List<string>();
-                for (int i = 0; i < k; i++)
+            for (int j = 0; j < dgv1.RowCount - 1; j++)
+            {
+                for (int i = 0; i < dgv1.RowCount - 1; i++)
                 {
-                    rtbDistance.AppendText(distanceAscending[i].ToString() + Environment.NewLine);
-                    rbtIndex.AppendText(distanceAscendingIndexNumber[i].ToString() + Environment.NewLine);
-                    rbtClass.AppendText(classData[Convert.ToInt32(distanceAscendingIndexNumber[i])] + Environment.NewLine);
-                    classList.Add(classData[Convert.ToInt32(distanceAscendingIndexNumber[i])]);
-
+                    if (smallest > distance2Copy[i])
+                    {
+                        smallest = distance2Copy[i];
+                        distance2Ascending[j] = smallest;
+                        distance2AscendingIndexNumber[j] = i;
+                        lastNumber = i;
+                    }
                 }
+                distance2Copy[lastNumber] = 9999;
+                smallest = 9999;
+            }
 
-                var plusc = classList.Where(s => s.Contains("PLUS")).Count();
-                var minusc = classList.Where(s => s.Contains("MINUS")).Count();
+            rtbDistance.Text = null;
+            rbtIndex.Text = null;
+            rbtClass.Text = null;
+            List<string> classList = new List<string>();
+            List<string> class2List = new List<string>();
 
-                if (plusc > minusc)
-                {
-                    result = "PLUS";
-                }
-                else if (minusc > plusc)
-                {
-                    result = "MINUS";
-                }
-                else
-                {
-                    result = "NEAISKU";
-                }
+            for (int i = 0; i < k; i++)
+            {
+          //      rtbDistance.AppendText(distance2Ascending[i].ToString() + Environment.NewLine);
+          //      rbtIndex.AppendText(distance2AscendingIndexNumber[i].ToString() + Environment.NewLine);
+           //     rbtClass.AppendText(classData[Convert.ToInt32(distance2AscendingIndexNumber[i])] + Environment.NewLine);
+                //artimiausiu k klase- konkuruoj.
+                classList.Add(classData[Convert.ToInt32(distanceAscendingIndexNumber[i])]);
+                class2List.Add(classData[Convert.ToInt32(distance2AscendingIndexNumber[i])]);
+            }
+            //classdata- egzistuojancios klases pirmoj lentelej
+      
+            var plusc = classList.Where(s => s.Contains("PLUS")).Count();
+            var minusc = classList.Where(s => s.Contains("MINUS")).Count();
 
-                //filling table with results
-                dgv3.Rows[rc].Cells[2].Value = result;
-                rc ++;
-            
+            var plusc2 = class2List.Where(s => s.Contains("PLUS")).Count();
+            var minusc2 = class2List.Where(s => s.Contains("MINUS")).Count();
+
+            result = countingResult(plusc, minusc);
+            result2 = countingResult(plusc2, minusc2);
+
+            //filling table with results
+            dgv3.Rows[0].Cells[2].Value = result;
+            dgv3.Rows[1].Cells[2].Value = result2;
 
         }
-
-
     }
 }

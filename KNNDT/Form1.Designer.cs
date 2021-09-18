@@ -42,7 +42,6 @@ namespace KNNDT
             this.rtbDistance = new System.Windows.Forms.RichTextBox();
             this.rbtIndex = new System.Windows.Forms.RichTextBox();
             this.rbtClass = new System.Windows.Forms.RichTextBox();
-            this.label6 = new System.Windows.Forms.Label();
             this.x = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.y = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.dataGridViewTextBoxColumn1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -175,15 +174,6 @@ namespace KNNDT
             this.rbtClass.TabIndex = 13;
             this.rbtClass.Text = "";
             // 
-            // label6
-            // 
-            this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(587, 457);
-            this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(38, 15);
-            this.label6.TabIndex = 14;
-            this.label6.Text = "label6";
-            // 
             // x
             // 
             this.x.HeaderText = "Column1";
@@ -218,8 +208,7 @@ namespace KNNDT
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1305, 600);
-            this.Controls.Add(this.label6);
+            this.ClientSize = new System.Drawing.Size(995, 600);
             this.Controls.Add(this.rbtClass);
             this.Controls.Add(this.rbtIndex);
             this.Controls.Add(this.rtbDistance);
@@ -259,7 +248,6 @@ namespace KNNDT
         private System.Windows.Forms.RichTextBox rtbDistance;
         private System.Windows.Forms.RichTextBox rbtIndex;
         private System.Windows.Forms.RichTextBox rbtClass;
-        private System.Windows.Forms.Label label6;
         private System.Windows.Forms.DataGridViewTextBoxColumn x;
         private System.Windows.Forms.DataGridViewTextBoxColumn y;
         private System.Windows.Forms.DataGridViewTextBoxColumn dataGridViewTextBoxColumn1;
